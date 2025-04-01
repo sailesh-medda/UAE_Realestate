@@ -43,8 +43,8 @@ print(k)
 
 # CELL ********************
 
-df = spark.sql("SELECT * FROM realestate.transactions_old LIMIT 1000")
-display(df)
+df_to = spark.sql("SELECT * FROM realestate.transactions_old")
+display(df_to)
 
 # METADATA ********************
 
@@ -223,7 +223,7 @@ display(df12) # or df1.display() if you're in Databricks or similar environments
 
 # CELL ********************
 
-df = spark.sql("SELECT * FROM realestate.transactions_old")
+dfa = spark.sql("SELECT * FROM realestate.transactions_old")
 display(df.limit(10))
 
 # METADATA ********************
@@ -235,9 +235,149 @@ display(df.limit(10))
 
 # CELL ********************
 
-df12 = spark.read.format("csv").option("header","true").load("Files/transactions-2025-04-01.csv")
+from pyspark.sql.functions import col
+
+dfaa = dfa.withColumn("instance_date", col("instance_date").cast("date"))\
+          .select("transaction_id", "instance_date") \
+          .orderBy("instance_date") 
+display(dfaa)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+from pyspark.sql.functions import col
+
+dfaa = dfa.select("transaction_id", "instance_date") \
+          .orderBy("instance_date") 
+display(dfaa)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df1 = spark.read.format("csv").option("header","true").load("Files/transactions-2025-04-01.csv")
 # df now is a Spark DataFrame containing CSV data from "Files/transactions-2025-04-01.csv".
-display(df12)
+display(df1)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+from pyspark.sql.functions import to_date
+
+# Convert 'instance_date' from string to date
+dfaa = dfa.select("transaction_id", 
+                  to_date("instance_date", "dd-MM-yyyy").alias("instance_date")) \
+          .orderBy("instance_date")
+
+# Display the updated dataframe
+display(dfaa)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+from pyspark.sql.functions import to_date, year
+
+# Convert 'instance_date' from string to date and extract the year
+dfaa = dfa.select(
+            "transaction_id", 
+            to_date("instance_date", "dd-MM-yyyy").alias("instance_date")
+        ) \
+        .withColumn("year", year("instance_date")) \
+        .groupBy("year") \
+        .count() \
+        .orderBy("year")
+
+# Display the result
+display(dfaa)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+from pyspark.sql.functions import to_date
+
+# Convert 'instance_date' from string to date and keep all other columns
+dfaa = dfa.withColumn(
+            "instance_date", 
+            to_date("instance_date", "dd-MM-yyyy")
+        ).orderBy("instance_date")\
+        .filter(df.instance_date == "1416-07-02" )
+
+# Display the updated dataframe
+display(dfaa)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+from pyspark.sql.functions import to_date, lit
+
+# Convert 'instance_date' from string to date and keep all other columns
+dfaa = dfa.withColumn(
+            "instance_date", 
+            to_date("instance_date", "dd-MM-yyyy")
+        ).orderBy("instance_date") \
+        
+# Display the updated dataframe
+display(dfaa)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+from pyspark.sql.functions import to_date, lit
+
+# Convert 'instance_date' from string to date and keep all other columns
+dfaa = dfa.withColumn(
+            "instance_date", 
+            to_date("instance_date", "dd-MM-yyyy")
+        ).orderBy("instance_date") \
+        .filter(to_date(lit("1416-07-02"), "yyyy-MM-dd") == dfaa["instance_date"])
+
+# Display the updated dataframe
+display(dfaa)
+
 
 # METADATA ********************
 
