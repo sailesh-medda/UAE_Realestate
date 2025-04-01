@@ -220,3 +220,38 @@ display(df12) # or df1.display() if you're in Databricks or similar environments
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# CELL ********************
+
+df = spark.sql("SELECT * FROM realestate.transactions_old")
+display(df.limit(10))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df12 = spark.read.format("csv").option("header","true").load("Files/transactions-2025-04-01.csv")
+# df now is a Spark DataFrame containing CSV data from "Files/transactions-2025-04-01.csv".
+display(df12)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
