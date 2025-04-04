@@ -20,6 +20,11 @@
 # META   }
 # META }
 
+# MARKDOWN ********************
+
+# # To do 
+# ## Remove wadi Al safa 2
+
 # CELL ********************
 
 from pyspark.sql.functions import *
@@ -40,7 +45,7 @@ from pyspark.sql.functions import *
 # CELL ********************
 
 df = spark.sql("SELECT * FROM realestate.bronze_transactions_old")
-display(df)
+#display(df)
 
 # METADATA ********************
 
@@ -55,7 +60,7 @@ df_date_cleaned = df.withColumn(
     'instance_date',
     to_date(col('instance_date'), 'dd-MM-yyyy')  # Correct date format for the input data
 )
-display(df_date_cleaned)
+#display(df_date_cleaned)
 
 # METADATA ********************
 
@@ -82,7 +87,7 @@ Filtered_old= df_date_cleaned.select(
     col('rent_value').cast('int'),  # Casting to integer
     col('meter_rent_price').cast('int')  # Casting to integer
 )
-display(Filtered_old)
+#display(Filtered_old)
 
 # METADATA ********************
 
@@ -121,7 +126,7 @@ change1.count()
 
 # CELL ********************
 
-display(change1)
+#display(change1)
 
 # METADATA ********************
 
@@ -147,8 +152,8 @@ change1.printSchema()
 
 # CELL ********************
 
-q= change1.filter(col('transaction_id').isNull())
-display(q)
+# q= change1.filter(col('transaction_id').isNull())
+# #display(q)
 
 # METADATA ********************
 
@@ -159,8 +164,8 @@ display(q)
 
 # CELL ********************
 
-q= change1.filter(col('instance_date').isNull())
-display(q)
+# q= change1.filter(col('instance_date').isNull())
+# #display(q)
 
 # METADATA ********************
 
@@ -171,8 +176,8 @@ display(q)
 
 # CELL ********************
 
-q= change1.filter(col('property_type_en').isNull())
-display(q)
+# q= change1.filter(col('property_type_en').isNull())
+# #display(q)
 
 # METADATA ********************
 
@@ -184,7 +189,7 @@ display(q)
 # CELL ********************
 
 col8= change1.filter(col('nearest_landmark_en').isNull())
-display(col8)
+#display(col8)
 
 
 # METADATA ********************
@@ -200,7 +205,7 @@ asd = col8.groupBy('area_name_en','nearest_landmark_en')\
           .agg(count('transaction_id').alias('transaction_id_count')) \
           .select(col('area_name_en'), col('nearest_landmark_en'), col('transaction_id_count'))
 
-display(asd)
+#display(asd)
 
 # METADATA ********************
 
@@ -213,7 +218,23 @@ display(asd)
 
 test1 = Filtered_old.filter((col('area_name_en') == col('nearest_landmark_en')) & (col('nearest_landmark_en') != "Burj Khalifa") & (col('nearest_landmark_en') != "Dubai International Airport"))\
                     .select(col('area_name_en'), col('nearest_landmark_en'))
-display(test1)
+#display(test1)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+col8 = change1.withColumn(
+    'nearest_landmark_en',  # New column name (or the same column name)
+    when(col('nearest_landmark_en').isNull(), col('area_name_en'))  # Condition and value from another column
+    .otherwise(col('nearest_landmark_en'))  # Retain original value of 'column_1' if condition is not met
+)
+#display(col8)
 
 # METADATA ********************
 
@@ -225,11 +246,10 @@ display(test1)
 # CELL ********************
 
 col8 = col8.withColumn(
-    'nearest_landmark_en',  # New column name (or the same column name)
-    when(col('nearest_landmark_en').isNull(), col('area_name_en'))  # Condition and value from another column
-    .otherwise(col('nearest_landmark_en'))  # Retain original value of 'column_1' if condition is not met
+    'area_name_en',  # New column name (or the same column name)
+    when(col('area_name_en').isNull(), col('nearest_landmark_en'))  # Condition and value from another column
+    .otherwise(col('area_name_en'))  # Retain original value of 'column_1' if condition is not met
 )
-display(col8)
 
 # METADATA ********************
 
@@ -240,69 +260,11 @@ display(col8)
 
 # CELL ********************
 
-dfaa= col8.filter(col('nearest_landmark_en')==col('area_name_en'))
-display(dfaa)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-Filtered_old= dfaa
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-asd = Filtered_old.filter(col("nearest_landmark_en").isNull())
-display(asd)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-dfaa.count()
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-# asd1 = Filtered_old.groupBy(col('area_name_en'),col('nearest_landmark_en'))\
-#           .select((col('area_name_en'),col('nearest_landmark_en')))
-
-# display(asd1)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-fc = Filtered_old.count()
-col8c= col8.count()
-print(f"count of filtered is {fc}", f"count of col8 {col8c}")
+col8 = col8.withColumn(
+    'master_project_en',  # Column name
+    when(col('master_project_en').isNull(), 'NA')  # Replace NULL with 'NA'
+    .otherwise(col('master_project_en'))  # Retain original value if not NULL
+)
 
 # METADATA ********************
 
@@ -314,7 +276,32 @@ print(f"count of filtered is {fc}", f"count of col8 {col8c}")
 # CELL ********************
 
 
-display(Filtered_old)
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+col8.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# # check
+
+
+# CELL ********************
+
+Filtered_old= col8
 
 # METADATA ********************
 
@@ -325,81 +312,18 @@ display(Filtered_old)
 
 # CELL ********************
 
-q= change1.filter(col('area_name_en').isNull())
-display(q)
+# Use `agg()` and `isNull()` to count null values in each column directly
+null_counts = Filtered_old.agg(
+    sum(when(col('property_type_en').isNull(), 1).otherwise(0)).alias('property_type_en_nulls'),
+    sum(when(col('property_usage_en').isNull(), 1).otherwise(0)).alias('property_usage_en_nulls'),
+    sum(when(col('reg_type_en').isNull(), 1).otherwise(0)).alias('reg_type_en_nulls'),
+    sum(when(col('area_name_en').isNull(), 1).otherwise(0)).alias('area_name_en_nulls'),
+    sum(when(col('master_project_en').isNull(), 1).otherwise(0)).alias('master_project_en_nulls'),
+    sum(when(col('nearest_landmark_en').isNull(), 1).otherwise(0)).alias('nearest_landmark_en_nulls')
+)
 
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('master_project_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-mst = change1.filter(col("master_project_en").isNull())
-display(mst)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('procedure_area').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('property_type_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('rooms_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('actual_worth').isNull())
-
-display(q)
+# Show the result
+display(null_counts)
 
 # METADATA ********************
 
@@ -413,19 +337,6 @@ display(q)
 q= change1.filter(col('actual_worth').isNotNull())
 p = change1.filter(col('actual_worth').isNull())
 print(q.count(),p.count())
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-qt = q.withColumn("datadif",col('procedure_area')*col('meter_sale_price'))\
-      .select(col('datadif'),col('actual_worth'))
-display(qt)
 
 # METADATA ********************
 
@@ -474,6 +385,51 @@ Filtered_old = qwert
 # META   "language_group": "synapse_pyspark"
 # META }
 
+# CELL ********************
+
+Filtered_old.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df123f=Filtered_old.filter(col('area_name_en').isNull())
+display(df123f)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df123f2=Filtered_old.filter(col('actual_worth').isNull())
+display(df123f2)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # MARKDOWN ********************
 
 # # Checkpoint
@@ -481,7 +437,7 @@ Filtered_old = qwert
 # CELL ********************
 
 q= change1.filter(col('meter_sale_price').isNull())
-display(q)
+#display(q)
 
 # METADATA ********************
 
@@ -493,7 +449,7 @@ display(q)
 # CELL ********************
 
 q= change1.filter(col('rent_value').isNull())
-display(q)
+#display(q)
 
 # METADATA ********************
 
@@ -505,7 +461,7 @@ display(q)
 # CELL ********************
 
 q= change1.filter(col('meter_rent_price').isNull())
-display(q)
+#display(q)
 
 
 
@@ -526,18 +482,6 @@ display(q)
 
 # CELL ********************
 
-t = Filtered_old.filter(Filtered_old.instance_date < '1582-10-15')
-display(t)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
 Filtered_old= Filtered_old.filter(Filtered_old.instance_date >= '1582-10-15')
 
 # METADATA ********************
@@ -549,8 +493,29 @@ Filtered_old= Filtered_old.filter(Filtered_old.instance_date >= '1582-10-15')
 
 # CELL ********************
 
-t = Filtered_old.filter(Filtered_old.instance_date < '1582-10-15')
-display(t)
+Filtered_old = Filtered_old.filter(col('area_name_en')!='Wadi Al Safa 2')
+#display(Filtered_old)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+Filtered_old.count()
 
 # METADATA ********************
 
@@ -566,6 +531,65 @@ display(t)
 # CELL ********************
 
 Filtered_old.write.mode("overwrite").saveAsTable("silver_transaction_old")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# # Quality checks
+
+# CELL ********************
+
+display(Filtered_old)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+check1= Filtered_old.select()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# Use `agg()` and `isNull()` to count null values in each column directly
+null_counts = Filtered_old.agg(
+    sum(when(col('property_type_en').isNull(), 1).otherwise(0)).alias('property_type_en_nulls'),
+    sum(when(col('property_usage_en').isNull(), 1).otherwise(0)).alias('property_usage_en_nulls'),
+    sum(when(col('reg_type_en').isNull(), 1).otherwise(0)).alias('reg_type_en_nulls'),
+    sum(when(col('area_name_en').isNull(), 1).otherwise(0)).alias('area_name_en_nulls'),
+    sum(when(col('master_project_en').isNull(), 1).otherwise(0)).alias('master_project_en_nulls'),
+    sum(when(col('nearest_landmark_en').isNull(), 1).otherwise(0)).alias('nearest_landmark_en_nulls')
+)
+
+# Show the result
+display(null_counts)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # METADATA ********************
 

@@ -1,0 +1,64 @@
+table gold_dim_type_transaction_old
+	lineageTag: 024fdfba-a618-4c34-ae0b-2c0dc9c24306
+	sourceLineageTag: [dbo].[gold_dim_type_transaction_old]
+
+	column property_type_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: a831717b-dbad-474d-a0bd-39afb4981217
+		sourceLineageTag: property_type_en
+		summarizeBy: none
+		sourceColumn: property_type_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column rooms_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 16a0d38d-f706-4878-9539-ac0673512b30
+		sourceLineageTag: rooms_en
+		summarizeBy: none
+		sourceColumn: rooms_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column property_usage_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: a04479bc-8667-4a20-a0b6-d372c8c50058
+		sourceLineageTag: property_usage_en
+		summarizeBy: none
+		sourceColumn: property_usage_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column reg_type_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 9de205b9-fb9c-439d-934a-80e04763e363
+		sourceLineageTag: reg_type_en
+		summarizeBy: none
+		sourceColumn: reg_type_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column dim_type_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 300e59ad-f295-4907-9eb1-8aff713e5174
+		sourceLineageTag: dim_type_key
+		summarizeBy: none
+		sourceColumn: dim_type_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_dim_type_transaction_old = entity
+		mode: directLake
+		source
+			entityName: gold_dim_type_transaction_old
+			schemaName: dbo
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,9 @@
+relationship df00ab6d-2483-4ee4-b30c-1b45542b02b8
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'E-commerce Dataset'.Order_Date
+	toColumn: LocalDateTable_75841837-6599-4dd3-b521-dc0877e2c02a.Date
+
+relationship c3978673-01a5-ad36-b339-5a6690fea5f5
+	fromColumn: gold_fact_transaction_old.dim_type_key
+	toColumn: gold_dim_type_transaction_old.dim_type_key
+

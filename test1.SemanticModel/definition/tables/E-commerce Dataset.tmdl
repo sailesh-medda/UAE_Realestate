@@ -1,0 +1,164 @@
+table 'E-commerce Dataset'
+	lineageTag: e89c1508-57fb-44b2-b49a-ad09d533e8a8
+
+	column Order_Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ce0cd782-d36b-4076-a1e7-c10467400334
+		summarizeBy: none
+		sourceColumn: Order_Date
+
+		variation Variation
+			isDefault
+			relationship: df00ab6d-2483-4ee4-b30c-1b45542b02b8
+			defaultHierarchy: LocalDateTable_75841837-6599-4dd3-b521-dc0877e2c02a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: 50835d22-37a1-4d09-bb34-595b51c2fab7
+		summarizeBy: none
+		sourceColumn: Time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column Aging
+		dataType: int64
+		formatString: 0
+		lineageTag: 46667d40-9172-4960-b066-b7beba0dedde
+		summarizeBy: sum
+		sourceColumn: Aging
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Id
+		dataType: int64
+		formatString: 0
+		lineageTag: 584bfc0c-9b00-4aa0-8c5c-85b757aaaeaa
+		summarizeBy: count
+		sourceColumn: Customer_Id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: 40dc8817-fb48-4109-8272-ef2e3571ab50
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column Device_Type
+		dataType: string
+		lineageTag: 496d1b0a-332b-4efa-951d-af64eb00fc74
+		summarizeBy: none
+		sourceColumn: Device_Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Login_type
+		dataType: string
+		lineageTag: 1ea6a5c3-31e7-4965-b171-c66d7212cb5f
+		summarizeBy: none
+		sourceColumn: Customer_Login_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_Category
+		dataType: string
+		lineageTag: 2de0e108-e79f-43e9-8905-ff7caa2f0d10
+		summarizeBy: none
+		sourceColumn: Product_Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 7ed5c932-1c61-419d-8667-b450e798863a
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales
+		dataType: int64
+		formatString: 0
+		lineageTag: af50ba55-9fc5-4956-832c-455badb43f2c
+		summarizeBy: sum
+		sourceColumn: Sales
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 19f78fc7-3447-4bfc-9614-813caa9fc201
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Discount
+		dataType: double
+		lineageTag: 33d2799a-81e5-4b0a-9a95-1ae1873760bc
+		summarizeBy: sum
+		sourceColumn: Discount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Profit
+		dataType: double
+		lineageTag: 0415aab9-5438-43b9-a668-8a7940af0aca
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Shipping_Cost
+		dataType: double
+		lineageTag: b4ad0fdc-0034-4e13-b7df-a71ca716cac1
+		summarizeBy: sum
+		sourceColumn: Shipping_Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Order_Priority
+		dataType: string
+		lineageTag: 771ddb90-3356-4b54-a662-08c7531e43a4
+		summarizeBy: none
+		sourceColumn: Order_Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Payment_method
+		dataType: string
+		lineageTag: a31ea64e-e442-4d48-862a-dc87f650436b
+		summarizeBy: none
+		sourceColumn: Payment_method
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'E-commerce Dataset' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\saile\Downloads\E-commerce Dataset.csv"),[Delimiter=",", Columns=16, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Order_Date", type date}, {"Time", type time}, {"Aging", Int64.Type}, {"Customer_Id", Int64.Type}, {"Gender", type text}, {"Device_Type", type text}, {"Customer_Login_type", type text}, {"Product_Category", type text}, {"Product", type text}, {"Sales", Int64.Type}, {"Quantity", Int64.Type}, {"Discount", type number}, {"Profit", type number}, {"Shipping_Cost", type number}, {"Order_Priority", type text}, {"Payment_method", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

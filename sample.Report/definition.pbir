@@ -1,0 +1,8 @@
+{
+  "version": "4.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../UAE_realestate_gold_semantic_model_transaction_old.SemanticModel"
+    }
+  }
+}

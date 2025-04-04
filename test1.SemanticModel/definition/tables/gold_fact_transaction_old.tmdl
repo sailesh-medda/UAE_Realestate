@@ -1,0 +1,106 @@
+table gold_fact_transaction_old
+	lineageTag: 6b7133c8-ea9f-4024-b799-4c85ae984010
+
+	column transaction_id
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 24a84eb1-af3a-4bd0-80fc-774ebedc7695
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column instance_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 706dda7a-dd44-47a5-9ad8-0127dd27e050
+		summarizeBy: none
+		sourceColumn: instance_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column procedure_area
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 3c34edee-b38c-429f-a299-26bd7eda171f
+		summarizeBy: sum
+		sourceColumn: procedure_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_worth
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: f08f12a8-e7e9-4252-b165-68ddef27c340
+		summarizeBy: sum
+		sourceColumn: actual_worth
+
+		annotation SummarizationSetBy = Automatic
+
+	column meter_sale_price
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: ad811d96-9b6a-4702-9ec7-0a0b990b7aba
+		summarizeBy: sum
+		sourceColumn: meter_sale_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column rent_value
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 7f3192a4-23fa-461c-8cc0-ea0fcf27d7a9
+		summarizeBy: sum
+		sourceColumn: rent_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column meter_rent_price
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 8d7e54b0-eedc-45e1-a445-0095d076cbeb
+		summarizeBy: sum
+		sourceColumn: meter_rent_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column dim_type_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 582e3729-3f2d-420b-acde-54ba275cf5ad
+		summarizeBy: none
+		sourceColumn: dim_type_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column dim_area_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 900516f5-46c8-4841-9cbf-17575d9acb10
+		summarizeBy: sum
+		sourceColumn: dim_area_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_fact_transaction_old = m
+		mode: directQuery
+		source =
+				let
+				    Source = Sql.Databases("6mph4vtdhrtuvpedsjver2gyhm-svhlktvy5lcefdvl33htjmlyca.datawarehouse.fabric.microsoft.com"),
+				    test11 = Source{[Name="test11"]}[Data],
+				    dbo_gold_fact_transaction_old = test11{[Schema="dbo",Item="gold_fact_transaction_old"]}[Data]
+				in
+				    dbo_gold_fact_transaction_old
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,61 @@
+table gold_dim_type_transaction_old
+	lineageTag: 9627442d-bc9d-4efd-b44d-ae4ac744823f
+
+	column property_type_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: ec3e3103-450e-4635-962a-e6fd94ccca94
+		summarizeBy: none
+		sourceColumn: property_type_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column rooms_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: a64efb97-88c2-43a3-81a6-bf18ef19b5d5
+		summarizeBy: none
+		sourceColumn: rooms_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column property_usage_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: e59e0b76-9e8f-4456-ab1e-bc8f2dd5b131
+		summarizeBy: none
+		sourceColumn: property_usage_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column reg_type_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 8c125f9e-a051-4bda-a2ae-d6b492c11f67
+		summarizeBy: none
+		sourceColumn: reg_type_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column dim_type_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: cdd1ac1a-3918-4a9e-90a2-c94b921c3240
+		summarizeBy: none
+		sourceColumn: dim_type_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_dim_type_transaction_old = m
+		mode: directQuery
+		source =
+				let
+				    Source = Sql.Databases("6mph4vtdhrtuvpedsjver2gyhm-svhlktvy5lcefdvl33htjmlyca.datawarehouse.fabric.microsoft.com"),
+				    test11 = Source{[Name="test11"]}[Data],
+				    dbo_gold_dim_type_transaction_old = test11{[Schema="dbo",Item="gold_dim_type_transaction_old"]}[Data]
+				in
+				    dbo_gold_dim_type_transaction_old
+
+	annotation PBI_ResultType = Table
+

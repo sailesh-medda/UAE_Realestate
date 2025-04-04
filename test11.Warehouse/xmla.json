@@ -1,0 +1,368 @@
+{
+  "name": "{{Dataset_Name}}",
+  "compatibilityLevel": 1604,
+  "model": {
+    "name": "{{Dataset_Name}}",
+    "culture": "en-US",
+    "collation": "Latin1_General_100_BIN2_UTF8",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-US",
+    "tables": [
+      {
+        "name": "gold_dim_area_transaction_old",
+        "sourceLineageTag": "[dbo].[gold_dim_area_transaction_old]",
+        "columns": [
+          {
+            "name": "dim_area_key",
+            "dataType": "int64",
+            "sourceColumn": "dim_area_key",
+            "formatString": "0",
+            "sourceProviderType": "bigint",
+            "sourceLineageTag": "dim_area_key",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "area_name_en",
+            "dataType": "string",
+            "sourceColumn": "area_name_en",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "area_name_en",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "master_project_en",
+            "dataType": "string",
+            "sourceColumn": "master_project_en",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "master_project_en",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "nearest_landmark_en",
+            "dataType": "string",
+            "sourceColumn": "nearest_landmark_en",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "nearest_landmark_en",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "{{Partition_Name}}",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_dim_area_transaction_old",
+              "expressionSource": "DatabaseQuery",
+              "schemaName": "dbo"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "IsTableInBiModel",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "name": "gold_dim_type_transaction_old",
+        "sourceLineageTag": "[dbo].[gold_dim_type_transaction_old]",
+        "columns": [
+          {
+            "name": "property_type_en",
+            "dataType": "string",
+            "sourceColumn": "property_type_en",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "property_type_en",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "rooms_en",
+            "dataType": "string",
+            "sourceColumn": "rooms_en",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "rooms_en",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "property_usage_en",
+            "dataType": "string",
+            "sourceColumn": "property_usage_en",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "property_usage_en",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "reg_type_en",
+            "dataType": "string",
+            "sourceColumn": "reg_type_en",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "reg_type_en",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "dim_type_key",
+            "dataType": "int64",
+            "sourceColumn": "dim_type_key",
+            "formatString": "0",
+            "sourceProviderType": "bigint",
+            "sourceLineageTag": "dim_type_key",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "{{Partition_Name}}",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_dim_type_transaction_old",
+              "expressionSource": "DatabaseQuery",
+              "schemaName": "dbo"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "IsTableInBiModel",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "name": "gold_fact_transaction_old",
+        "sourceLineageTag": "[dbo].[gold_fact_transaction_old]",
+        "columns": [
+          {
+            "name": "transaction_id",
+            "dataType": "string",
+            "sourceColumn": "transaction_id",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "transaction_id",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "instance_date",
+            "dataType": "dateTime",
+            "sourceColumn": "instance_date",
+            "formatString": "General Date",
+            "sourceProviderType": "date",
+            "sourceLineageTag": "instance_date",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "procedure_area",
+            "dataType": "int64",
+            "sourceColumn": "procedure_area",
+            "formatString": "0",
+            "sourceProviderType": "int",
+            "sourceLineageTag": "procedure_area",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "actual_worth",
+            "dataType": "int64",
+            "sourceColumn": "actual_worth",
+            "formatString": "0",
+            "sourceProviderType": "int",
+            "sourceLineageTag": "actual_worth",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "meter_sale_price",
+            "dataType": "int64",
+            "sourceColumn": "meter_sale_price",
+            "formatString": "0",
+            "sourceProviderType": "int",
+            "sourceLineageTag": "meter_sale_price",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "rent_value",
+            "dataType": "int64",
+            "sourceColumn": "rent_value",
+            "formatString": "0",
+            "sourceProviderType": "int",
+            "sourceLineageTag": "rent_value",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "meter_rent_price",
+            "dataType": "int64",
+            "sourceColumn": "meter_rent_price",
+            "formatString": "0",
+            "sourceProviderType": "int",
+            "sourceLineageTag": "meter_rent_price",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "dim_type_key",
+            "dataType": "int64",
+            "sourceColumn": "dim_type_key",
+            "formatString": "0",
+            "sourceProviderType": "bigint",
+            "sourceLineageTag": "dim_type_key",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "dim_area_key",
+            "dataType": "int64",
+            "sourceColumn": "dim_area_key",
+            "formatString": "0",
+            "sourceProviderType": "bigint",
+            "sourceLineageTag": "dim_area_key",
+            "summarizeBy": "sum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "{{Partition_Name}}",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_fact_transaction_old",
+              "expressionSource": "DatabaseQuery",
+              "schemaName": "dbo"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "IsTableInBiModel",
+            "value": "False"
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "name": "DatabaseQuery",
+        "kind": "m",
+        "expression": "let\n    database = {{TDS_Endpoint}}\nin\n    database\n"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      },
+      {
+        "name": "SourceLineageTagType",
+        "value": "DatabaseFullyQualifiedName"
+      }
+    ]
+  }
+}

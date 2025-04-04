@@ -34,18 +34,6 @@ from pyspark.sql.functions import *
 
 # CELL ********************
 
-silver_transaction_old = spark.sql("SELECT * FROM realestate.silver_transaction_old")
-display(df)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
 
 # METADATA ********************
 
@@ -67,6 +55,18 @@ display(df)
 # MARKDOWN ********************
 
 # # Gold
+
+# CELL ********************
+
+silver_transaction_old = spark.sql("SELECT * FROM realestate.silver_transaction_old")
+display(silver_transaction_old)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # CELL ********************
 
@@ -145,6 +145,17 @@ display(dim_type)
 
 # CELL ********************
 
+dim_type_gold = dim_type
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 dim_type=dim_type.select(col('dim_type_key'),col('property_type_en'),col('rooms_en'),col('property_usage_en'),col('reg_type_en'))
 display(dim_type)
 
@@ -197,10 +208,31 @@ display(test2_dim_area)
 
 # CELL ********************
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 dim_area = test2_dim_area.select(
     'dim_area_key', 'area_name_en', 'master_project_en', 'nearest_landmark_en'
 )
 display(dim_area)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dim_area_gold = dim_area
 
 # METADATA ********************
 
@@ -230,7 +262,8 @@ display(join_areadim)
 
 # CELL ********************
 
-join_areadim.count()
+l =join_areadim.filter(col('dim_area_key').isNull())
+display(l)
 
 # METADATA ********************
 
@@ -241,6 +274,7 @@ join_areadim.count()
 
 # CELL ********************
 
+join_areadim.count()
 
 # METADATA ********************
 
@@ -283,7 +317,7 @@ join_typedim = join_areadim.join(
     (silver_transaction_old.property_usage_en == dim_type.property_usage_en) &
     (silver_transaction_old.reg_type_en == dim_type.reg_type_en)&
     (silver_transaction_old.property_type_en == dim_type.property_type_en),
-    'left'
+    'inner'
 )
 
 
@@ -499,13 +533,107 @@ fact_trans.printSchema()
 # META   "language_group": "synapse_pyspark"
 # META }
 
+# CELL ********************
+
+fact_trans.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # MARKDOWN ********************
 
 # # Writing to gold table
 
 # CELL ********************
 
-fact_trans.write.mode("overwrite").saveAsTable("gold_transaction_old")
+fact_trans.write.mode("overwrite").saveAsTable("gold_fact_transaction_old")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dim_type_gold.write.mode("overwrite").saveAsTable("gold_dim_type_transaction_old")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dim_area_gold.write.mode("overwrite").saveAsTable("gold_dim_area_transaction_old")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+fact_trans.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # METADATA ********************
 

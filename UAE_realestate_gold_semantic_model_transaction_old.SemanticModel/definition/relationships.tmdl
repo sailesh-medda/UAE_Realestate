@@ -1,0 +1,8 @@
+relationship 7262d1a3-c1b3-9f50-bc4d-da9bfa35dbda
+	fromColumn: gold_fact_transaction_old.dim_area_key
+	toColumn: gold_dim_area_transaction_old.dim_area_key
+
+relationship 78369dd1-9e8f-276e-e781-34cfb4eddce8
+	fromColumn: gold_fact_transaction_old.dim_type_key
+	toColumn: gold_dim_type_transaction_old.dim_type_key
+

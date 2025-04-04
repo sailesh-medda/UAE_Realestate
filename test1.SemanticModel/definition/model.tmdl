@@ -1,0 +1,26 @@
+model Model
+	culture: en-IN
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["gold_dim_area_transaction_old","gold_dim_type_transaction_old","gold_fact_transaction_old","gold_dim_area_transaction_old (2)","gold_dim_type_transaction_old (2)","gold_fact_transaction_old (2)","E-commerce Dataset"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBIDesktopVersion = 2.141.1253.0 (25.03)+74f9999a1e95f78c739f3ea2b96ba340e9ba8729
+
+ref table gold_dim_area_transaction_old
+ref table gold_dim_type_transaction_old
+ref table gold_fact_transaction_old
+ref table 'gold_dim_area_transaction_old (2)'
+ref table 'gold_dim_type_transaction_old (2)'
+ref table 'gold_fact_transaction_old (2)'
+ref table 'E-commerce Dataset'
+ref table DateTableTemplate_cde69a07-776d-4ab5-abd8-7bb54744fd02
+ref table LocalDateTable_75841837-6599-4dd3-b521-dc0877e2c02a
+
+ref cultureInfo en-IN
+

@@ -1,0 +1,51 @@
+table 'gold_dim_area_transaction_old (2)'
+	lineageTag: 519d77c9-f13c-49a6-bbed-e3a97d8b9b36
+
+	column dim_area_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: a3baa493-3357-4bdc-be9f-f7f2a50650bd
+		summarizeBy: sum
+		sourceColumn: dim_area_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column area_name_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 6805c87b-d00e-4d45-bd5d-50b4ee4b7854
+		summarizeBy: none
+		sourceColumn: area_name_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column master_project_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 060fdb93-387c-4102-a16d-bbe91e04468d
+		summarizeBy: none
+		sourceColumn: master_project_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column nearest_landmark_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 002c039f-b73c-4254-8e2a-67071d830900
+		summarizeBy: none
+		sourceColumn: nearest_landmark_en
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'gold_dim_area_transaction_old (2)' = m
+		mode: directQuery
+		source =
+				let
+				    Source = Sql.Database("6mph4vtdhrtuvpedsjver2gyhm-svhlktvy5lcefdvl33htjmlyca.datawarehouse.fabric.microsoft.com", "test11"),
+				    dbo_gold_dim_area_transaction_old = Source{[Schema="dbo",Item="gold_dim_area_transaction_old"]}[Data]
+				in
+				    dbo_gold_dim_area_transaction_old
+
+	annotation PBI_ResultType = Table
+

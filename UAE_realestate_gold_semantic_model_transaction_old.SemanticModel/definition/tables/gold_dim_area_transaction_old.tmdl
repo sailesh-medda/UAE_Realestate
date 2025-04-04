@@ -1,0 +1,54 @@
+table gold_dim_area_transaction_old
+	lineageTag: 497ff502-7507-47a2-ae07-35af9effba2d
+	sourceLineageTag: [dbo].[gold_dim_area_transaction_old]
+
+	column dim_area_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: f50ac0fb-c885-4216-b436-6765c82e77af
+		sourceLineageTag: dim_area_key
+		summarizeBy: none
+		sourceColumn: dim_area_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column area_name_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 87afa3b5-66e0-46e5-8d68-4fa17cf9b12d
+		sourceLineageTag: area_name_en
+		summarizeBy: none
+		sourceColumn: area_name_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column master_project_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: f00c0a08-5c8d-49c6-bfa5-57061539ef81
+		sourceLineageTag: master_project_en
+		summarizeBy: none
+		sourceColumn: master_project_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column nearest_landmark_en
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 7d0f1b50-38c3-46d8-b0f6-b4084b4841ef
+		sourceLineageTag: nearest_landmark_en
+		summarizeBy: none
+		sourceColumn: nearest_landmark_en
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_dim_area_transaction_old = entity
+		mode: directLake
+		source
+			entityName: gold_dim_area_transaction_old
+			schemaName: dbo
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

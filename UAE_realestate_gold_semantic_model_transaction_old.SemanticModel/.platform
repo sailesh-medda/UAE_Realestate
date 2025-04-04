@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "UAE_realestate_gold_semantic_model_transaction_old"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "f84202c6-df50-ae84-4017-81e40caf3485"
+  }
+}
