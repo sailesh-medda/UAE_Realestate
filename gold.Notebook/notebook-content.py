@@ -32,14 +32,9 @@ from pyspark.sql.functions import *
 # META   "language_group": "synapse_pyspark"
 # META }
 
-# MARKDOWN ********************
-
-# # Remove Unnecessary Rows and change the date 
-
-
 # CELL ********************
 
-df = spark.sql("SELECT * FROM realestate.bronze_transactions_old")
+silver_transaction_old = spark.sql("SELECT * FROM realestate.silver_transaction_old")
 display(df)
 
 # METADATA ********************
@@ -51,140 +46,342 @@ display(df)
 
 # CELL ********************
 
-df_date_cleaned = df.withColumn(
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# # Gold
+
+# CELL ********************
+
+df = silver_transaction_old.groupBy(col('reg_type_en'))\
+                 .agg(count('reg_type_en').alias('hello'))\
+                 .select(col('reg_type_en'),col('hello'))
+display(df)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+silver_transaction_old.printSchema()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dimdf = silver_transaction_old.select(
+    'property_type_en',
+    'property_usage_en',
+    'reg_type_en',
+    'area_name_en',
+    'master_project_en',
+    'nearest_landmark_en'
+)
+display(dimdf)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dim_type = silver_transaction_old.select(
+    'property_type_en',
+    'rooms_en',
+    'property_usage_en',
+    'reg_type_en'
+).distinct()
+display(dim_type)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dim_type = dim_type.withColumn(
+    'dim_type_key', monotonically_increasing_id()
+)
+display(dim_type)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dim_type=dim_type.select(col('dim_type_key'),col('property_type_en'),col('rooms_en'),col('property_usage_en'),col('reg_type_en'))
+display(dim_type)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+test_dim_area = silver_transaction_old.select(
+    'area_name_en',
+    'master_project_en',
+    'nearest_landmark_en'
+).distinct()
+display(test_dim_area)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+test2_dim_area = test_dim_area.withColumn(
+    'dim_area_key', monotonically_increasing_id()
+)
+display(test2_dim_area)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dim_area = test2_dim_area.select(
+    'dim_area_key', 'area_name_en', 'master_project_en', 'nearest_landmark_en'
+)
+display(dim_area)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+join_areadim = silver_transaction_old.join(
+    dim_area,
+    (silver_transaction_old.area_name_en == dim_area.area_name_en) & 
+    (silver_transaction_old.master_project_en == dim_area.master_project_en) &
+    (silver_transaction_old.nearest_landmark_en == dim_area.nearest_landmark_en),
+    'left'
+)
+display(join_areadim)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+join_areadim.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+from pyspark.sql import functions as F
+
+# Check for duplicates in dim_type
+duplicates_in_dim_type = dim_type.groupBy(
+    'rooms_en', 
+    'property_usage_en', 
+    'reg_type_en'
+).count().filter(F.col('count') > 1)
+
+display(duplicates_in_dim_type)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+join_areadim = join_areadim.withColumnRenamed('area_name_en', 'join_area_name_en') \
+                           .withColumnRenamed('master_project_en', 'join_master_project_en') \
+                           .withColumnRenamed('nearest_landmark_en', 'join_nearest_landmark_en')
+
+# Now, perform the join:
+join_typedim = join_areadim.join(
+    dim_type,
+    (silver_transaction_old.rooms_en == dim_type.rooms_en) & 
+    (silver_transaction_old.property_usage_en == dim_type.property_usage_en) &
+    (silver_transaction_old.reg_type_en == dim_type.reg_type_en)&
+    (silver_transaction_old.property_type_en == dim_type.property_type_en),
+    'left'
+)
+
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+join_typedim.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+join_areadim.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+join_typedim = join_typedim.withColumnRenamed('rooms_en', 'join_rooms_en') \
+                           .withColumnRenamed('property_usage_en', 'join_property_usage_en') \
+                           .withColumnRenamed('reg_type_en', 'join_reg_type_en')
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+join_typedim.printSchema()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+combined_dim = join_typedim
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(combined_dim)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# Create the fact table by excluding the dimension columns
+fact_trans = join_typedim.select(
+    'transaction_id',
     'instance_date',
-    to_date(col('instance_date'), 'dd-MM-yyyy')  # Correct date format for the input data
+    'procedure_area',
+    'actual_worth',
+    'meter_sale_price',
+    'rent_value',
+    'meter_rent_price',
+    'dim_type_key',
+    'dim_area_key'
+
 )
-display(df_date_cleaned)
 
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-Filtered_old= df_date_cleaned.select(
-    col('transaction_id'),  # No cast needed, assuming it's already the correct type
-    col('instance_date').cast("date"),  # Casting to date type
-    col('property_type_en'),
-    col('property_usage_en'),
-    col('reg_type_en'),
-    col('area_name_en'),
-    col('master_project_en'),
-    col('nearest_landmark_en'),
-    col('rooms_en'),
-    col('procedure_area').cast('int'),  # Casting to integer
-    col('actual_worth').cast('int'),  # Casting to integer
-    col('meter_sale_price').cast('int'),  # Casting to integer
-    col('rent_value').cast('int'),  # Casting to integer
-    col('meter_rent_price').cast('int')  # Casting to integer
-)
-display(Filtered_old)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# MARKDOWN ********************
-
-# # Check for other necessary column and infer those columns 
-# #### Filtered_old is the final data frame 
-
-
-# CELL ********************
-
-change1= Filtered_old
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-change1.count()
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-display(change1)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-change1.printSchema()
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# MARKDOWN ********************
-
-# ### Infer the columns which has NULL values
-
-# CELL ********************
-
-q= change1.filter(col('transaction_id').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('instance_date').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('property_type_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-col8= change1.filter(col('nearest_landmark_en').isNull())
-display(col8)
+# Display the fact table
+display(fact_trans)
 
 
 # METADATA ********************
@@ -196,11 +393,8 @@ display(col8)
 
 # CELL ********************
 
-asd = col8.groupBy('area_name_en','nearest_landmark_en')\
-          .agg(count('transaction_id').alias('transaction_id_count')) \
-          .select(col('area_name_en'), col('nearest_landmark_en'), col('transaction_id_count'))
-
-display(asd)
+k = fact_trans.filter(col('transaction_id').isNull())
+display(k)
 
 # METADATA ********************
 
@@ -211,9 +405,7 @@ display(asd)
 
 # CELL ********************
 
-test1 = Filtered_old.filter((col('area_name_en') == col('nearest_landmark_en')) & (col('nearest_landmark_en') != "Burj Khalifa") & (col('nearest_landmark_en') != "Dubai International Airport"))\
-                    .select(col('area_name_en'), col('nearest_landmark_en'))
-display(test1)
+silver_transaction_old.count()
 
 # METADATA ********************
 
@@ -224,12 +416,11 @@ display(test1)
 
 # CELL ********************
 
-col8 = col8.withColumn(
-    'nearest_landmark_en',  # New column name (or the same column name)
-    when(col('nearest_landmark_en').isNull(), col('area_name_en'))  # Condition and value from another column
-    .otherwise(col('nearest_landmark_en'))  # Retain original value of 'column_1' if condition is not met
-)
-display(col8)
+# Get distinct rows based on the transaction_id column
+df = silver_transaction_old.select('transaction_id').distinct()
+
+# Show the result
+display(df)
 
 # METADATA ********************
 
@@ -240,8 +431,7 @@ display(col8)
 
 # CELL ********************
 
-dfaa= col8.filter(col('nearest_landmark_en')==col('area_name_en'))
-display(dfaa)
+df.count()
 
 # METADATA ********************
 
@@ -252,7 +442,11 @@ display(dfaa)
 
 # CELL ********************
 
-Filtered_old= dfaa
+# Get distinct rows based on the transaction_id column
+df = fact_trans.select('transaction_id').distinct()
+
+# Show the result
+display(df)
 
 # METADATA ********************
 
@@ -263,8 +457,7 @@ Filtered_old= dfaa
 
 # CELL ********************
 
-asd = Filtered_old.filter(col("nearest_landmark_en").isNull())
-display(asd)
+df.count()
 
 # METADATA ********************
 
@@ -275,7 +468,7 @@ display(asd)
 
 # CELL ********************
 
-dfaa.count()
+fact_trans.count()
 
 # METADATA ********************
 
@@ -286,10 +479,7 @@ dfaa.count()
 
 # CELL ********************
 
-# asd1 = Filtered_old.groupBy(col('area_name_en'),col('nearest_landmark_en'))\
-#           .select((col('area_name_en'),col('nearest_landmark_en')))
-
-# display(asd1)
+display(fact_trans)
 
 # METADATA ********************
 
@@ -300,172 +490,7 @@ dfaa.count()
 
 # CELL ********************
 
-fc = Filtered_old.count()
-col8c= col8.count()
-print(f"count of filtered is {fc}", f"count of col8 {col8c}")
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-
-display(Filtered_old)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('area_name_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('master_project_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-mst = change1.filter(col("master_project_en").isNull())
-display(mst)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('procedure_area').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('property_type_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('rooms_en').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('actual_worth').isNull())
-
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('actual_worth').isNotNull())
-p = change1.filter(col('actual_worth').isNull())
-print(q.count(),p.count())
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-qt = q.withColumn("datadif",col('procedure_area')*col('meter_sale_price'))\
-      .select(col('datadif'),col('actual_worth'))
-display(qt)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-qwert = change1.withColumn(
-    'actual_worth', 
-    when(col('actual_worth').isNull(), col('procedure_area') * col('meter_sale_price'))
-     .otherwise(col('actual_worth'))
-)
-display(qwert)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q1= qwert.filter(col('actual_worth').isNull())
-
-display(q1)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-Filtered_old = qwert
+fact_trans.printSchema()
 
 # METADATA ********************
 
@@ -476,96 +501,11 @@ Filtered_old = qwert
 
 # MARKDOWN ********************
 
-# # Checkpoint
+# # Writing to gold table
 
 # CELL ********************
 
-q= change1.filter(col('meter_sale_price').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('rent_value').isNull())
-display(q)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-q= change1.filter(col('meter_rent_price').isNull())
-display(q)
-
-
-
-
-
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# MARKDOWN ********************
-
-# # clean the date with wrong entry
-
-
-# CELL ********************
-
-t = Filtered_old.filter(Filtered_old.instance_date < '1582-10-15')
-display(t)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-Filtered_old= Filtered_old.filter(Filtered_old.instance_date >= '1582-10-15')
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-t = Filtered_old.filter(Filtered_old.instance_date < '1582-10-15')
-display(t)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# MARKDOWN ********************
-
-# # Writing table to Silver table
-
-# CELL ********************
-
-Filtered_old.write.mode("overwrite").saveAsTable("silver_transaction_old")
+fact_trans.write.mode("overwrite").saveAsTable("gold_transaction_old")
 
 # METADATA ********************
 
